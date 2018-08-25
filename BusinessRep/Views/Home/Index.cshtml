@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>Business Repute</h1>
+    <p class="lead">Business Repute.</p>
+    <p><a href="#" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+
+<div class="row">
+
+    <form id="searchForm" class="searchBar" style="margin:auto;max-width:400px">
+        <input type="text" placeholder="Enter Business Name..." name="search" id="search">
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        jQuery(function ($) {
+            $("#searchForm").validate({
+                submitHandler: function () {
+                    var vm = {};
+                    vm.businessName = $.trim($("#search").val());
+
+                    $.ajax({
+                            url: "/api/LookupBusiness/GetBusinessRep/" + $.trim($("#search").val()),
+                            method: "get",
+                            data: vm
+                        })
+                        .done(function () {
+
+                        })
+                        .fail(function () {
+
+                        });
+
+                    return false;
+
+                }
+            });
+        });
+
+    </script>
+}
