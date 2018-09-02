@@ -2,40 +2,126 @@
 @{
     ViewBag.Title = "Register";
 }
+@section styles
+{
+    <style>
+        #imageUpload
+        {
+            display: none;
+        }
 
+        #profileImage
+        {
+            cursor: pointer;
+        }
+
+        #profile-container {
+            width: 250px;
+            height: 250px;
+            overflow: hidden;
+            
+        }
+
+        #profile-container img {
+            width: 250px;
+            height: 250px;
+        }
+    </style>
+}
 <h2>@ViewBag.Title.</h2>
 
-@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     <h4>Create a new account.</h4>
     <hr />
-    @Html.ValidationSummary("", new { @class = "text-danger" })
-    <div class="form-group">
-        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+    <div class="row">
+        <div class="col-xs-8">
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="form-group required">
+                @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label noPadding" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group required">
+                @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label noPadding" })
+                <div class="col-md-10">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group required">
+                @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label noPadding" })
+
+                <div class="col-md-10">
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group required">
+                @Html.LabelFor(m => m.FirstName, new { @class = "col-md-2 control-label noPadding" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group required">
+                @Html.LabelFor(m => m.LastName, new { @class = "col-md-2 control-label noPadding" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.BusinessName, new { @class = "col-md-2 control-label noPadding" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.BusinessName, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PhoneNumber, new { @class = "col-md-2 control-label noPadding" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address, new { @class = "col-md-2 control-label noPadding" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(m => m.Address, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" class="btn btn-default" value="Register" />
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-        </div>
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" class="btn btn-default" value="Register" />
+        
+        <div class="col-xs-4">
+            <br/>
+            <div id="profile-container" style="border: solid thin black">
+                <image id="profileImage" src="~/Content/default-profile.png"/>
+            </div>
+            <input id="imageUpload" type="file" name="profilePhoto" placeholder="Photo">
         </div>
     </div>
 }
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    
+    <script>
+        $("#profileImage").click(function(e) {
+            $("#imageUpload").click();
+        });
+
+        function fasterPreview( uploader ) {
+            if ( uploader.files && uploader.files[0] ){
+                $('#profileImage').attr('src', 
+                    window.URL.createObjectURL(uploader.files[0]) );
+            }
+        }
+
+        $("#imageUpload").change(function(){
+            fasterPreview( this );
+        });
+    </script>
 }

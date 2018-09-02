@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Facebook;
-
+using Newtonsoft.Json;
+using Yelp.Api.Models;
 
 namespace BusinessReputation.Controllers.API
 {
@@ -19,27 +21,17 @@ namespace BusinessReputation.Controllers.API
 
 
         [HttpGet]
-        [Route("api/LookupBusiness/GetBusinessRep/{businessName}")]
-        public async Task<IHttpActionResult> GetBusinessRep(string businessName)
+        [Route("api/LookupBusiness/GetBusinessRep/{businessName}/{location}")]
+        public async Task<IHttpActionResult> GetBusinessRep(string businessName,string location )
         {
-            var yelp = new Yelp.Api.Client("UYGEnpjdfW81wQSMHNlQ0gf1ZuMwU2ooIkXamypVqyrixxhchKNO-YTceDT_5ThzppfaNw2ksZZO-aDqaMwuW4l_kffCw6qDHMQjY2UwU6G4Rnf4jC5u1B9toumAW3Yx");
 
-            var request = (HttpWebRequest)WebRequest.Create($"https://api.yelp.com/v3/businesses/search/{businessName}");
-            request.Headers.Add("Bearer", "UYGEnpjdfW81wQSMHNlQ0gf1ZuMwU2ooIkXamypVqyrixxhchKNO-YTceDT_5ThzppfaNw2ksZZO-aDqaMwuW4l_kffCw6qDHMQjY2UwU6G4Rnf4jC5u1B9toumAW3Yx");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "UYGEnpjdfW81wQSMHNlQ0gf1ZuMwU2ooIkXamypVqyrixxhchKNO-YTceDT_5ThzppfaNw2ksZZO-aDqaMwuW4l_kffCw6qDHMQjY2UwU6G4Rnf4jC5u1B9toumAW3Yx");
+            var yelpResults = await client.GetAsync($"https://api.yelp.com/v3/businesses/search?term={businessName}&location={location}");
 
+            
+            var businessSearchResults  = JsonConvert.DeserializeObject<SearchResponse>(yelpResults.Content.ReadAsStringAsync().Result);
 
-            try
-            {
-                var res = request.GetResponse().GetResponseStream();
-
-                var results = await client.GetAsync($"https://api.yelp.com/v3/businesses/search/{businessName}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
+            
 
 
             var fb = new FacebookClient();

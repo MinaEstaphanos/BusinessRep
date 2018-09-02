@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -16,6 +17,26 @@ namespace BusinessRep.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        [Required]
+        [StringLength(30)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(30)]
+        public string LastName { get; set; }
+
+        
+        [StringLength(100)]
+        public string BusinessName { get; set; }
+
+        [StringLength(200)]
+        public string Address { get; set; }
+
+        public string ProfilePhotoFileName { get; set; }
+
+
+
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

@@ -1,6 +1,8 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
+@model BusinessRep.ViewModels.BusinessSearchViewModel
+ 
 
 <div class="jumbotron">
     <h1>Business Repute</h1>
@@ -10,39 +12,108 @@
 
 <div class="row">
 
-    <form id="searchForm" class="searchBar" style="margin:auto;max-width:400px">
-        <input type="text" placeholder="Enter Business Name..." name="search" id="search">
-        <button type="submit"><i class="fa fa-search"></i></button>
+    <form id="searchForm" method="post" action="@Url.Action("Search","Home")" class="searchBar" style="margin: auto; max-width: 400px">
+        <div class="row">
+            @Html.ValidationSummary( "", new { @class = "text-danger" })
+            <div class="col-xs-5 noPadding">
+
+                @Html.TextBoxFor(m => m.BusinessLocation, new { placeholder = "Enter Location...", id = "location" })
+
+            </div>
+            <div class="col-xs-7 noPadding">
+                @Html.TextBoxFor(m => m.BusinessName, new { placeholder = "Enter Business Name...", id = "business" })
+
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </div>
+
+
+        </div>
     </form>
 </div>
+<div class="row">
+    <ul class="nav nav-tabs" id="recent-tab">
 
-@section scripts
+        <li class="active">
+            <a class="tabLink" data-toggle="tab" href="#yelp-tab" aria-expanded="false">Yelp</a>
+        </li>
+
+        <li class="">
+            <a class="tabLink" data-toggle="tab" href="#google-tab" aria-expanded="false">Google</a>
+        </li>
+
+        <li class="">
+            <a class="tabLink" data-toggle="tab" href="#facebook-tab" aria-expanded="true">Facebook</a>
+        </li>
+    </ul>
+    <br />
+    <br />
+    <div class="tab-content">
+        <div id="yelp-tab" class="tab-pane active">
+            @if (Model.YelpBusinesses != null && Model.YelpBusinesses.Count > 0)
+            {
+                <table id="results" class="table table-bordered table-striped display" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                City
+                            </th>
+                            <th>
+                                <div class="rating"></div>
+                                Rating
+                            </th>
+                            <th>
+                                Reviews Count
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var business in Model.YelpBusinesses)
+                        {
+                            <tr>
+                                <td>@business.Name</td>
+                                <td>@business.Location.City</td>
+                                <td>
+                                    <div class="rateit" data-rateit-value="@business.Rating" data-rateit-ispreset="true" data-rateit-readonly="true"></div>
+
+
+                                </td>
+                                <td>@business.ReviewCount</td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            }
+        </div>
+        <div id="google-tab" class="tab-pane">
+
+        </div>
+        <div id="facebook-tab" class="tab-pane">
+
+        </div>
+    </div>
+</div>
+
+    @section scripts
 {
-    @Scripts.Render("~/bundles/jqueryval")
-    <script type="text/javascript">
-        jQuery(function ($) {
-            $("#searchForm").validate({
-                submitHandler: function () {
-                    var vm = {};
-                    vm.businessName = $.trim($("#search").val());
+        @Scripts.Render("~/bundles/jqueryval")
+        <script type="text/javascript">
+            $('.tabLink').on('click',
+                function (e) {
+                   
+                    e.preventDefault();
+                });
+            jQuery(function ($) {
+                $('#results').DataTable();
 
-                    $.ajax({
-                            url: "/api/LookupBusiness/GetBusinessRep/" + $.trim($("#search").val()),
-                            method: "get",
-                            data: vm
-                        })
-                        .done(function () {
 
-                        })
-                        .fail(function () {
 
-                        });
 
-                    return false;
-
-                }
             });
-        });
 
-    </script>
-}
+        </script>
+    }

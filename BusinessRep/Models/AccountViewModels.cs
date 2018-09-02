@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web;
 
 namespace BusinessRep.Models
 {
@@ -79,6 +80,25 @@ namespace BusinessRep.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [StringLength(30)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(30)]
+        public string LastName { get; set; }
+
+        
+        [StringLength(100)]
+        public string BusinessName { get; set; }
+
+        [StringLength(200)]
+        public string Address { get; set; }
+
+        [RegularExpression("^(?!0+$)(\\+\\d{1,3}[- ]?)?(?!0+$)\\d{10,15}$")]
+        public string PhoneNumber { get; set; }
+        public HttpPostedFileBase ProfilePhoto { get; set; }
     }
 
     public class ResetPasswordViewModel

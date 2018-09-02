@@ -54,9 +54,9 @@ namespace BusinessRep
             //   consumerKey: "",
             //   consumerSecret: "");
 
-            app.UseFacebookAuthentication(
-                appId: "322237511685257",
-                appSecret: "04be62426a1feadaac4e1a5746101fac");
+            //app.UseFacebookAuthentication(
+            //    appId: "",
+            //    appSecret: "");
 
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{

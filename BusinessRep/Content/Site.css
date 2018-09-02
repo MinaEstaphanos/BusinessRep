@@ -64,3 +64,26 @@ form.searchBar::after {
     clear: both;
     display: table;
 }
+
+.noPadding {
+    padding: 0;
+}
+.noMargin {
+    margin: 0;
+}
+.required label {
+    font-weight: bold;
+}
+
+    .required label:after {
+        color: #e32;
+        content: ' *';
+        display: inline;
+    }
+.profilePic {
+    width: 36px;
+    height: 36px;
+    border-radius: 100%;
+     
+    
+}

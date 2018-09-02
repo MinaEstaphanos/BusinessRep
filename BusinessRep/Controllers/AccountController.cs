@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using BusinessRep.Domain;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -147,26 +149,46 @@ namespace BusinessRep.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase profilePhoto)
         {
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+            if (!ModelState.IsValid)
+                return View(model);
 
-                    return RedirectToAction("Index", "Home");
-                }
-                AddErrors(result);
+            var profilePhotoFileName = Const.DefaultProfilePhoto;
+            if (profilePhoto != null)
+            {
+                var ext = Path.GetExtension(profilePhoto.FileName);
+                profilePhotoFileName = DateTime.Now.Ticks + ext;
+                profilePhoto.SaveAs(Path.Combine(Server.MapPath($"~/{Const.ProfilePhotosFolder}"), profilePhotoFileName));
             }
+                
+
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                PhoneNumber = model.PhoneNumber,
+                BusinessName = model.BusinessName,
+                Address = model.Address,
+                ProfilePhotoFileName = profilePhotoFileName
+
+            };
+            var result = await UserManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    
+                // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
+                // Send an email with this link
+                // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+                return RedirectToAction("Index", "Home");
+            }
+            AddErrors(result);
 
             // If we got this far, something failed, redisplay form
             return View(model);
@@ -422,7 +444,27 @@ namespace BusinessRep.Controllers
 
             base.Dispose(disposing);
         }
+        [Authorize]
+        public async Task<ActionResult> GetProfilePhoto()
+        {
+            var user = await System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>()
+                .FindByIdAsync(System.Web.HttpContext.Current.User.Identity.GetUserId());
 
+            var filePath = user.ProfilePhotoFileName ?? Const.DefaultProfilePhoto;
+
+            filePath = Path.Combine(Server.MapPath($"~/{Const.ProfilePhotosFolder}"), filePath);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return HttpNotFound();
+            }
+            var filedata = System.IO.File.ReadAllBytes(filePath);
+            
+          
+            return Json(new { base64imgage = Convert.ToBase64String(filedata) }
+                , JsonRequestBehavior.AllowGet);
+
+
+        }
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
